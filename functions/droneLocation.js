@@ -1,16 +1,23 @@
 
 const clone = require("deepcopy");
 
-// Listens for new messages added to /drones/:pushId/original
-//
-exports.handler = function (change, context, admin) {
-    // Grab the current value of what was written to the Realtime Database.
-    const original = change.after.val();
+// Listens for new messages added to /drones/
+exports.handler = function (snapshot, admin) {
     // move the drone by one second
-    var moved = clone(original);
-    moved.currentLocation = original.currentLocation + 1;
+    console.log(snapshot);
+    console.log(JSON.stringify(snapshot));
+    const key = Object.keys(snapshot)[0];
+    var originalDrone = snapshot[key].drone;
+    console.log(JSON.stringify(originalDrone));
+    console.log(originalDrone.currentLocation, originalDrone.pathPoints.length, key);
+    originalDrone.currentLocation = originalDrone.currentLocation + 1;
     // destination reached when all paths ran through
-    if (!(moved.currentLocation < moved.pathPoints.length)) {
+    if (!originalDrone.pathPoints) {
+        console.log("pathPoints false", JSON.stringify(originalDrone));
+        return;
+    }
+    console.log(originalDrone.currentLocation, originalDrone.pathPoints.length, key);
+    if (originalDrone.currentLocation >= originalDrone.pathPoints.length) {
         // notificate delivery
         var message = {
             notification: {
@@ -28,12 +35,18 @@ exports.handler = function (change, context, admin) {
             .catch((error) => {
                 console.log('Error sending message:', error);
             });
+        return;
     }
-    sleep(1000); // sleep 1 sec
-    // You must return a Promise when performing asynchronous tasks inside a Functions such as
-    // writing to the Firebase Realtime Database.
-    // Setting an "uppercase" sibling in the Realtime Database returns a Promise.
-    return snapshot.ref.set(moved);
+    sleep(100); // sleep 1000 ms = 1 sec
+    // write update to db
+    console.log("updating " + key);
+    //snapshot.child(key + '/drone').ref.update(originalDrone);
+    // snapshot.child(key).ref.set({ drone: originalDrone });
+    return admin.database.ref('/drones/' + key).set({ drone: originalDrone }, (result) => {
+        return console.log("res", result);
+    });
+    //admin.database('/drones/' + key + '/drone').ref.set(originalDrone);
+    // snapshot.update(originalDrone);
 };
 
 function sleep(milliseconds) {

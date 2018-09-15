@@ -21,7 +21,7 @@ exports.handler = function (req, res, admin) {
             droneRef.set(null);
             // finish request
             return res.status(200).send({
-                result: writeResult
+                result: "success"
             });
             // catch exception
         }).catch(ex => {

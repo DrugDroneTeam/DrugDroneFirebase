@@ -1,5 +1,3 @@
-'use strict';
-
 const requestDrone = require('./droneProvider');
 const updateLocation = require('./droneLocation');
 const confirmDrone = require('./droneConfirmation');
@@ -18,15 +16,20 @@ const admin = require('firebase-admin');
 admin.initializeApp();
 
 exports.requestDrone = functions.https.onRequest((req, res) => {
-    requestDrone.handler(req, res, admin);
+    return requestDrone.handler(req, res, admin);
+});
+exports.requestDroneAssisted = functions.https.onRequest((req, res) => {
+    return requestDrone.assistedHandler(req, res, admin);
 });
 exports.confirmDrone = functions.https.onRequest((req, res) => {
-    confirmDrone.handler(req, res, admin);
+    return confirmDrone.handler(req, res, admin);
 });
-exports.updateLocation = functions.database.ref('/drones/{pushId}/drone').onCreate((change, context) => {
-    updateLocation.handler(change, context, admin);
+exports.updateLocationCreated = admin.database.ref('/drones').onWrite((change) => {
+    // Grab the current value of what was written to the Realtime Database.
+    snapshot = change.after;
+    return updateLocation.handler(snapshot, admin);
 });
-exports.updateLocation = functions.database.ref('/drones/{pushId}/drone').onUpdate((change, context) => {
-    updateLocation.handler(change, context, admin);
-});
+//exports.updateLocationUpdated = functions.database.ref('/drones/{pushId}/drone').onChange((snapshot) => {
+//    return updateLocation.handler(snapshot, admin);
+//});
 
