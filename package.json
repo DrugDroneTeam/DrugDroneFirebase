@@ -1,0 +1,28 @@
+{
+  "name": "drugdronefirebase",
+  "version": "1.0.0",
+  "description": "Firebase backend for DrugDroneApp",
+  "main": "index.js",
+  "dependencies": {
+    "firebase-tools": "^4.2.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DrugDroneTeam/DrugDroneFirebase.git"
+  },
+  "keywords": [
+    "firebase",
+    "drone",
+    "emergency"
+  ],
+  "author": "Tim Bernhard",
+  "license": "GNU 3.0",
+  "bugs": {
+    "url": "https://github.com/DrugDroneTeam/DrugDroneFirebase/issues"
+  },
+  "homepage": "https://github.com/DrugDroneTeam/DrugDroneFirebase#readme"
+}
