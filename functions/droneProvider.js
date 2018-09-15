@@ -4,6 +4,12 @@ const clone = require("deepcopy");
 // Realtime Database under the path /drones/:pushId/drone
 exports.handler = function (req, res, admin) {
     console.log("Drone requested.");
+    // validate requested parameters
+    if (!requestIsValid(req)) {
+        return res.status(401).send({
+            error: "Not all required parameters present."
+        });
+    }
     // Grab the drone parameter.
     const requestedDrone = req.body.drone;
     // Grab the air traffic data.
@@ -22,6 +28,23 @@ exports.handler = function (req, res, admin) {
 };
 
 /**
+ * Assert that all necessairy parameters are present
+ *
+ * @param {Object} req
+ */
+function requestIsValid(req) {
+    const body = req.body;
+    if (body.traffic && body.drone) {
+        const drone = body.drone;
+        return (
+            (drone.start && drone.start.lat && drone.start.long && drone.end.alt)
+            && (drone.end && drone.end.lat && drone.end.long && drone.end.alt)
+        );
+    }
+    return false;
+}
+
+/**
  * Find the path/the locations the drone will have.
  * In actuality, this should come from an API provided by the drone
  *
@@ -37,11 +60,13 @@ function findPath(start, end, via, traffic) {
         start.time = new Date(start.time);
     }
     // go to pharmacy
-    var path = move(start, via, traffic);
-    // at pharmacy, take drug
-    var pharmacyPath = clone(path[path.length - 1]);
-    pharmacyPath.time.setSeconds(pharmacyPath.time.getSeconds() + 1);
-    path.push(pharmacyPath);
+    if (via) {
+        var path = move(start, via, traffic);
+        // at pharmacy, take drug
+        var pharmacyPath = clone(path[path.length - 1]);
+        pharmacyPath.time.setSeconds(pharmacyPath.time.getSeconds() + 1);
+        path.push(pharmacyPath);
+    }
     // go to target
     var path2 = move(path[path.length - 1], end, traffic);
     return path.concat(path2);

@@ -2,6 +2,7 @@
 
 const requestDrone = require('./droneProvider');
 const updateLocation = require('./droneLocation');
+const confirmDrone = require('./droneConfirmation');
 
 // // Create and Deploy Your First Cloud Functions
 // // https://firebase.google.com/docs/functions/write-firebase-functions
@@ -18,6 +19,12 @@ admin.initializeApp();
 
 exports.requestDrone = functions.https.onRequest((req, res) => {
     requestDrone.handler(req, res, admin);
+});
+exports.confirmDrone = functions.https.onRequest((req, res) => {
+    confirmDrone.handler(req, res, admin);
+});
+exports.updateLocation = functions.database.ref('/drones/{pushId}/drone').onCreate((change, context) => {
+    updateLocation.handler(change, context, admin);
 });
 exports.updateLocation = functions.database.ref('/drones/{pushId}/drone').onUpdate((change, context) => {
     updateLocation.handler(change, context, admin);

@@ -7,6 +7,10 @@
       "npm --prefix ./functions run lint"
     ]
   },
+  "firestore": {
+    "rules": "firestore.rules",
+    "indexes": "firestore.indexes.json"
+  },
   "hosting": {
     "public": "public",
     "ignore": [

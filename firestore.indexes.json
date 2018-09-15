@@ -1,0 +1,21 @@
+{
+    "indexes": [
+        {
+            "collectionId": "drones",
+            "fields": [
+                {
+                    "fieldPath": "userId",
+                    "mode": "ASCENDING"
+                },
+                {
+                    "fieldPath": "drone",
+                    "mode": "DESCENDING"
+                },
+                {
+                    "fieldPath": "confirmationTime",
+                    "mode": "DESCENDING"
+                }
+            ]
+        }
+    ]
+}

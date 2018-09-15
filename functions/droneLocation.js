@@ -16,7 +16,8 @@ exports.handler = function (change, context, admin) {
             notification: {
                 title: "Drone deployed.",
                 body: "Enjoy your life, thanks for living with DrugDrones"
-            }
+            },
+            topic: "drone-status"
         };
         admin.messaging().send(message)
             .then((response) => {
@@ -28,7 +29,7 @@ exports.handler = function (change, context, admin) {
                 console.log('Error sending message:', error);
             });
     }
-    sleep(60);
+    sleep(1000); // sleep 1 sec
     // You must return a Promise when performing asynchronous tasks inside a Functions such as
     // writing to the Firebase Realtime Database.
     // Setting an "uppercase" sibling in the Realtime Database returns a Promise.
