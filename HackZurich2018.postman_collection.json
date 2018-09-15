@@ -1,0 +1,60 @@
+{
+	"info": {
+		"_postman_id": "f1092b37-33f9-446d-8296-e8a2c0fc18be",
+		"name": "HackZurich2018",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "DrugDrone Request",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"drone\": {\n\t\t\"start\": {\n\t\t\t\"lon\": 0,\n\t\t\t\"lat\": 0,\n\t\t\t\"alt\": 0\n\t\t},\n\t\t\"end\": {\n\t\t\t\"lon\": 0,\n\t\t\t\"lat\": 0,\n\t\t\t\"alt\": 0\n\t\t},\n\t\t\"pharma\": {\n\t\t\t\"lon\": 100,\n\t\t\t\"lat\": 500,\n\t\t\t\"alt\": 1000\n\t\t}\n\t},\n\t\"traffic\": {\n\t\t\"timestamp\": \"2018-09-15T09:46:32.083165+00:00\",\n    \"data\": [\n        {\n            \"icao\": \"4CA73F\",\n            \"lat\": 48.8219410759,\n            \"lon\": 6.38677628627,\n            \"alt\": 9645,\n            \"speed\": 228.92758,\n            \"heading\": -10.29,\n            \"last_update\": \"2018-09-15T09:46:29.640100+00:00\"\n        },\n        {\n            \"icao\": \"394A0F\",\n            \"lat\": 47.3522224346,\n            \"lon\": 8.56935592903,\n            \"alt\": 9442,\n            \"speed\": 265.967548,\n            \"heading\": 130.3,\n            \"last_update\": \"2018-09-15T09:46:29.640100+00:00\"\n        }\n    ]\n\t}\n}"
+				},
+				"url": {
+					"raw": "https://us-central1-drugdronefirebase.cloudfunctions.net/requestDrone",
+					"protocol": "https",
+					"host": [
+						"us-central1-drugdronefirebase",
+						"cloudfunctions",
+						"net"
+					],
+					"path": [
+						"requestDrone"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "AirTraffic",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "https://hackzurich.involi.live/http/",
+					"protocol": "https",
+					"host": [
+						"hackzurich",
+						"involi",
+						"live"
+					],
+					"path": [
+						"http",
+						""
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

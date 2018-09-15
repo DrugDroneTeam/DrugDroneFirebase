@@ -1,9 +1,9 @@
-// The Cloud Functions for Firebase SDK to create Cloud Functions and setup triggers.
-require("index")
+const clone = require("deepcopy");
 
 // Take the text parameter passed to this HTTP endpoint and insert it into the
 // Realtime Database under the path /drones/:pushId/drone
-exports.requestDrone = functions.https.onRequest((req, res) => {
+exports.handler = function (req, res, admin) {
+    console.log("Drone requested.");
     // Grab the drone parameter.
     const requestedDrone = req.body.drone;
     // Grab the air traffic data.
@@ -14,10 +14,12 @@ exports.requestDrone = functions.https.onRequest((req, res) => {
     requestedDrone.currentLocation = 0;
     // Push the new message into the Realtime Database using the Firebase Admin SDK.
     return admin.database().ref('/drones').push({ drone: requestedDrone }).then((snapshot) => {
-        // Redirect with 303 SEE OTHER to the URL of the pushed object in the Firebase console.
-        return res.redirect(303, snapshot.ref.toString());
+        // Return last inserted id
+        return res.status(200).send({
+            key: snapshot.key
+        });
     });
-});
+};
 
 /**
  * Find the path/the locations the drone will have.
@@ -29,14 +31,20 @@ exports.requestDrone = functions.https.onRequest((req, res) => {
  * @param {Object} traffic
  */
 function findPath(start, end, via, traffic) {
+    if (!start.time) {
+        start.time = new Date();
+    } else if (!(start.time instanceof Date)) {
+        start.time = new Date(start.time);
+    }
     // go to pharmacy
     var path = move(start, via, traffic);
     // at pharmacy, take drug
-    pos.time += 60;
+    var pharmacyPath = clone(path[path.length - 1]);
+    pharmacyPath.time.setSeconds(pharmacyPath.time.getSeconds() + 1);
+    path.push(pharmacyPath);
     // go to target
     var path2 = move(path[path.length - 1], end, traffic);
-    path.concat(path2);
-    return path;
+    return path.concat(path2);
 }
 
 /**
@@ -50,13 +58,13 @@ function move(start, end, traffic) {
     var path = [];
     var pos = start;
     // as long as the drone is not at target
-    while (pos.lat !== end.lat || pos.lon !== end.lon || pos.alt !== end.alt) {
+    while (pos.lat !== end.lat && pos.lon !== end.lon && pos.alt !== end.alt) {
         // basic movement, ignoring speed changes, wind, collisions, mountains, masts, ...
         pos.lat = step(pos.lat, end.lat);
         pos.lon = step(pos.lon, end.lon);
         pos.alt = step(pos.alt, end.alt);
-        pos.time += 60;
-        path.push(Object.clone(pos));
+        pos.time.setSeconds(pos.time.getSeconds() + 1);
+        path.push(clone(pos));
     }
     return path;
 }
@@ -71,7 +79,7 @@ function step(start, target) {
     if (start === target) {
         return target;
     }
-    var speedOfDrone = 80 * (1000 / 360); // km/h => m/s
+    var speedOfDrone = 80 / 360; // [km/h] => [km/s] because step t in [s]
     var prefix = start > target ? -1 : 1;
     var next = start + prefix * speedOfDrone * 1;
     var prefix2 = next > target ? -1 : 1;
