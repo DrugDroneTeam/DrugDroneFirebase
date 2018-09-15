@@ -2,7 +2,7 @@
   "name": "drugdronefirebase",
   "version": "1.0.0",
   "description": "Firebase backend for DrugDroneApp",
-  "main": "index.js",
+  "main": "functions/index.js",
   "dependencies": {
     "firebase-tools": "^4.2.1"
   },
