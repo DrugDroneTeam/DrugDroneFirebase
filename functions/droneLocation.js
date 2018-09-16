@@ -3,7 +3,8 @@ const clone = require("deepcopy");
 
 // Listens for new messages added to /drones/
 exports.handler = function (snapshot, admin) {
-    // move the drone by one second
+    // move the drone by one second¨
+    console.log("moving ...");
     console.log(snapshot);
     console.log(JSON.stringify(snapshot));
     const key = Object.keys(snapshot)[0];
@@ -18,6 +19,7 @@ exports.handler = function (snapshot, admin) {
     }
     console.log(originalDrone.currentLocation, originalDrone.pathPoints.length, key);
     if (originalDrone.currentLocation >= originalDrone.pathPoints.length) {
+        snapshot.off("value");
         // notificate delivery
         var message = {
             notification: {
