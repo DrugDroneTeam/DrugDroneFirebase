@@ -153,7 +153,7 @@ function findPath(start, end, via, traffic) {
         var pharmacyPath = clone(path[path.length - 1]);
         pharmacyPath.time.setSeconds(pharmacyPath.time.getSeconds() + 3);
         path.push(pharmacyPath);
-        console.log(pharmacyPath.length + " pharma points");
+        //console.log(pharmacyPath.length + " pharma points");
     }
     // go to target
     const path2 = move(via ? path[path.length - 1] : start, end, traffic);
@@ -173,7 +173,7 @@ function move(start, end, traffic) {
     const latSpeed = (diff(pos.lat, end.lat)) / 100;
     const lonSpeed = (diff(pos.lon, end.lon)) / 100;
     const altSpeed = (diff(pos.alt, end.alt)) / 100;
-    console.log("Path before move", path);
+    //console.log("Path before move", path);
     // as long as the drone is not at target
     do {
         // basic movement, ignoring speed changes, wind, collisions, mountains, masts, ...
@@ -182,7 +182,7 @@ function move(start, end, traffic) {
         pos.alt = step(pos.alt, end.alt, altSpeed);
         pos.time.setSeconds(pos.time.getSeconds() + 1);
         path.push(clone(pos));
-        console.log("Path in move", path);
+        //console.log("Path in move", path);
     } while (pos.lat !== end.lat || pos.lon !== end.lon || pos.alt !== end.alt);
     var endPos = clone(end);
     endPos.time = path[path.length - 1].time;
@@ -204,7 +204,7 @@ function step(start, target, speed) {
         return target;
     }
     const speedOfDrone = speed; // ? speed : (30 / 360) / 6371; // [km/h] => [m/s] => [rad/s] because step t in [s], lat & lon in rad
-    console.log("speed: " + speedOfDrone);
+    //console.log("speed: " + speedOfDrone);
     var prefix = start > target ? -1 : 1;
     var next = start + prefix * speedOfDrone;
     var prefix2 = next > target ? -1 : 1;
