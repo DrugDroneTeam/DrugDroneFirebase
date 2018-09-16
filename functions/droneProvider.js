@@ -19,7 +19,7 @@ exports.handler = function (req, res, admin) {
     // set inital position to be moved
     requestedDrone.currentLocation = 0;
     // Push the new message into the Realtime Database using the Firebase Admin SDK.
-    console.log("saving drone with " + requestedDrone.pathPoints.length + " points.");
+    console.log("saving drone with " + requestedDrone.pathPoints.length + " points & startlocation " + requestedDrone.currentLocation);
     return admin.database().ref('/drones').push({ drone: requestedDrone }).then((snapshot) => {
         // Return last inserted id
         return res.status(200).send({
@@ -29,83 +29,83 @@ exports.handler = function (req, res, admin) {
 };
 
 // handler for the Google Assistant WebHook
-// exports.assistedHandler = function (req, res, admin) {
-//     // actions setup
-//     const ActionsSdkApp = require('actions-on-google').ActionsSdkApp;
-//     const ApiAiApp = require('actions-on-google').ApiAiApp;
-//     const app = new ApiAiApp({ request: req, response: res });
-//     const intent = app.getIntent();
-//     // check intent
-//     switch (intent) {
-//         case 'input.welcome': {
-//             // you are able to request for multiple permissions at once
-//             const permissions = [
-//                 app.SupportedPermissions.NAME,
-//                 app.SupportedPermissions.DEVICE_PRECISE_LOCATION
-//             ];
-//             app.askForPermissions('We need to know where the medication has to go', permissions);
-//         }
-//             break;
-//         case 'Ineedmedication.Ineedmedication-fallback': {
-//             if (app.isPermissionGranted()) {
-//                 // permissions granted.
-//                 const displayName = app.getUserName().displayName;
+exports.assistedHandler = function (req, res, admin) {
+    // actions setup
+    const ActionsSdkApp = require('actions-on-google').ActionsSdkApp;
+    const ApiAiApp = require('actions-on-google').ApiAiApp;
+    const app = new ApiAiApp({ request: req, response: res });
+    const intent = app.getIntent();
+    // check intent
+    switch (intent) {
+        case 'input.welcome': {
+            // you are able to request for multiple permissions at once
+            const permissions = [
+                app.SupportedPermissions.NAME,
+                app.SupportedPermissions.DEVICE_PRECISE_LOCATION
+            ];
+            app.askForPermissions('We need to know where the medication has to go', permissions);
+        }
+            break;
+        case 'Ineedmedication.Ineedmedication-fallback': {
+            if (app.isPermissionGranted()) {
+                // permissions granted.
+                const displayName = app.getUserName().displayName;
 
-//                 //NOTE: app.getDeviceLocation().address always return undefined for me. not sure if it is a bug.
-//                 // 			app.getDeviceLocation().coordinates seems to return a correct values
-//                 //			so i have to use node-geocoder to get the address out of the coordinates
-//                 const coordinates = app.getDeviceLocation().coordinates;
-//                 const address = app.getDeviceLocation().address;
+                //NOTE: app.getDeviceLocation().address always return undefined for me. not sure if it is a bug.
+                // 			app.getDeviceLocation().coordinates seems to return a correct values
+                //			so i have to use node-geocoder to get the address out of the coordinates
+                const coordinates = app.getDeviceLocation().coordinates;
+                const address = app.getDeviceLocation().address;
 
-//                 // we still do not have money to buy us out of google,
-//                 // and can't expect users to tell us where the pharmacy is. So: just here, something, invented, hardcoded
-//                 const start = {
-//                     long: 0,
-//                     lat: 40,
-//                     alt: 400
-//                 };
-//                 const pharma = {
-//                     long: 8.5188729999999993,
-//                     lat: 47.387764999999987,
-//                     alt: 412
-//                 };
-//                 const requestedDrone = {
-//                     start: start,
-//                     pharma: pharma,
-//                     end: {
-//                         "lat": coordinates.latitude,
-//                         "lon": coordinates.longitude,
-//                         "alt": 414
-//                     }
-//                 };
-//                 requestedDrone.pathPoints = findPath(requestedDrone.start, requestedDrone.end, requestedDrone.pharma, traffic);
-//                 // set inital position to be moved
-//                 requestedDrone.currentLocation = 0;
-//                 // Push the new message into the Realtime Database using the Firebase Admin SDK.
-//                 admin.database().ref('/drones').push({ drone: requestedDrone }).then((snapshot) => {
-//                     // Return last inserted id
-//                     // return res.status(200).send({
-//                     //     key: snapshot.key
-//                     // });
-//                     return true;
-//                 }).catch((e) => {
-//                     return false;
-//                 });
-//                 app.tell('Dear ' + app.getUserName().givenName + '! We send medication to ' + address);
-//                 return app.tell('It will arrive approx. at ' + requestedDrone.pathPoints[requestedDrone.pathPoints.length - 1].time.toLocaleDateString("en-US"));
-//             } else {
-//                 // permissions are not granted. ask them one by one manually
-//                 return app.ask('Alright. Can you tell me your coordinates please?');
-//             }
-//         }
-//         // break;
-//         default:
-//             return res.status(401).send({
-//                 err: "invalid request"
-//             });
-//     }
-//     return app.tell('This text should never be read by anyone. Should. Ha. Ha.');
-// }
+                // we still do not have money to buy us out of google,
+                // and can't expect users to tell us where the pharmacy is. So: just here, something, invented, hardcoded
+                const start = {
+                    long: 0,
+                    lat: 40,
+                    alt: 400
+                };
+                const pharma = {
+                    long: 8.5188729999999993,
+                    lat: 47.387764999999987,
+                    alt: 412
+                };
+                const requestedDrone = {
+                    start: start,
+                    pharma: pharma,
+                    end: {
+                        "lat": coordinates.latitude,
+                        "lon": coordinates.longitude,
+                        "alt": 414
+                    }
+                };
+                requestedDrone.pathPoints = findPath(requestedDrone.start, requestedDrone.end, requestedDrone.pharma, traffic);
+                // set inital position to be moved
+                requestedDrone.currentLocation = 0;
+                // Push the new message into the Realtime Database using the Firebase Admin SDK.
+                admin.database().ref('/drones').push({ drone: requestedDrone }).then((snapshot) => {
+                    // Return last inserted id
+                    // return res.status(200).send({
+                    //     key: snapshot.key
+                    // });
+                    return true;
+                }).catch((e) => {
+                    return false;
+                });
+                app.tell('Dear ' + app.getUserName().givenName + '! We send medication to ' + address);
+                return app.tell('It will arrive approx. at ' + requestedDrone.pathPoints[requestedDrone.pathPoints.length - 1].time.toLocaleDateString("en-US"));
+            } else {
+                // permissions are not granted. ask them one by one manually
+                return app.ask('Alright. Can you tell me your coordinates please?');
+            }
+        }
+        // break;
+        default:
+            return res.status(401).send({
+                err: "invalid request"
+            });
+    }
+    return app.tell('This text should never be read by anyone. Should. Ha. Ha.');
+}
 
 /**
  * Assert that all necessairy parameters are present
@@ -170,9 +170,9 @@ function findPath(start, end, via, traffic) {
 function move(start, end, traffic) {
     var pos = clone(start);
     var path = [clone(pos)];
-    const latSpeed = (diff(pos.lat, end.lat)) / 100;
-    const lonSpeed = (diff(pos.lon, end.lon)) / 100;
-    const altSpeed = (diff(pos.alt, end.alt)) / 100;
+    const latSpeed = (diff(pos.lat, end.lat)) / 60;
+    const lonSpeed = (diff(pos.lon, end.lon)) / 60;
+    const altSpeed = (diff(pos.alt, end.alt)) / 60;
     //console.log("Path before move", path);
     // as long as the drone is not at target
     do {

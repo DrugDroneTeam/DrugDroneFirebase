@@ -1,27 +1,27 @@
 
 const clone = require("deepcopy");
 
-// Listens for new messages added to /drones/
+// Listens for new drones added to /drones/
 exports.handler = function (snapshot, admin) {
-    // move the drone by one second
-    console.log(snapshot);
-    console.log(JSON.stringify(snapshot));
-    if (!snapshot) {
+    // move the drone by delta t
+    if (!snapshot || !snapshot.val()) {
+        // this may occurr as we also subscribe to the "delete" event
         console.warn("No snapshot to move.", snapshot);
         return;
     }
     const key = Object.keys(snapshot.val())[0];
     console.log("moving snapshot with key " + key);
-    var originalDrone = snapshot.val()[key].drone;
-    console.log(JSON.stringify(originalDrone));
-    console.log(originalDrone.currentLocation, originalDrone.pathPoints.length, key);
+    var originalDrone = clone(snapshot.val()[key].drone);
+    if (Math.random() < 0.25) {
+        console.log(originalDrone.currentLocation, originalDrone.pathPoints.length, key);
+        console.log(JSON.stringify(originalDrone));
+    }
     originalDrone.currentLocation = originalDrone.currentLocation + 1;
     // destination reached when all paths ran through
     if (!originalDrone.pathPoints) {
         console.log("pathPoints false", JSON.stringify(originalDrone));
         return;
     }
-    console.log(originalDrone.currentLocation, originalDrone.pathPoints.length, key);
     if (originalDrone.currentLocation >= originalDrone.pathPoints.length) {
         //snapshot.off("value");
         // notificate delivery
@@ -43,19 +43,13 @@ exports.handler = function (snapshot, admin) {
             });
         return;
     }
-    sleep(10); // sleep 1000 ms = 1 sec
+    sleep(350); // sleep 1000 ms = 1 sec
     // write update to db
     console.log("finally updating " + key);
-    //snapshot.child(key + '/drone').ref.update(originalDrone);
-    //var promise = snapshot.child(key).ref.set({ drone: originalDrone });
-    //return admin.database.ref('/drones/' + key).set({ drone: originalDrone }, (result) => {
-    //    return console.log("res", result);
-    //});
-    //var promise = admin.database('drones/' + key + '/drone').ref.set(originalDrone);
     var promise = admin.database().ref('drones/' + key + '/drone').set(originalDrone);
     // snapshot.update(originalDrone);
     promise.then(() => {
-        console.log("then");
+        console.log("promised then after update of " + key);
         return true;
         // work with the document snapshot here, and send your response
     })
