@@ -4,7 +4,7 @@
   "description": "Firebase backend for DrugDroneApp",
   "main": "functions/index.js",
   "dependencies": {
-    "firebase-tools": "^7.7.0"
+    "firebase-tools": "^7.9.0"
   },
   "devDependencies": {},
   "scripts": {
